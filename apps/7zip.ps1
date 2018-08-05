@@ -22,7 +22,7 @@ Foreach ($link in $htmlObject.links) {
         #relative url
         else {
             
-            $7zUrlSegments = ([System.Uri]$7zUrl).Segments
+            $7zUrlSegments = $urlObject.Segments
             $relative = $urlOrigin
 
             for($($i = 0; $max = $7zUrlSegments.Count - 1); $i -lt $max; $i++) {
