@@ -10,9 +10,31 @@ $htmlObject = New-Object -Com "HTMLFile"
 $htmlObject.write([System.Text.Encoding]::Unicode.GetBytes($html))
 
 Foreach ($link in $htmlObject.links) {
+
     if ($link.textContent -eq 'Download' -and $link.pathname.endswith('-x64.exe')) {
-        $downloadUrl = $link.href.Replace('about:', $urlOrigin)
-        $7zInstaller = $link.nameProp
+
+        $downloadUrl = $link.href.Replace('about:', '')
+
+        #absolute url
+        if ($downloadUrl.StartsWith('/')) {
+            $downloadUrl = $urlOrigin + $downloadUrl
+        }
+        #relative url
+        else {
+            
+            $7zUrlSegments = ([System.Uri]$7zUrl).Segments
+            $relative = $urlOrigin
+
+            for($($i = 0; $max = $7zUrlSegments.Count - 1); $i -lt $max; $i++) {
+                $relative += $7zUrlSegments[$i]
+            }
+
+            $downloadUrl = $relative + $downloadUrl
+        }
+
+        $downloadUrlSegments = ([System.Uri]$downloadUrl).Segments
+        $7zInstaller = $downloadUrlSegments[$downloadUrlSegments.Count - 1]
+
         (new-object System.Net.WebClient).DownloadFile($downloadUrl, (Get-Item -Path '.\').FullName + '\' + $7zInstaller)
         cmd /C $7zInstaller /S
         rm $7zInstaller
