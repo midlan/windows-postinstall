@@ -11,7 +11,7 @@ $htmlObject.write([System.Text.Encoding]::Unicode.GetBytes($html))
 
 Foreach ($link in $htmlObject.links) {
     if ($link.textContent -eq 'Download' -and $link.pathname.endswith('-x64.exe')) {
-        $downloadUrl = $urlOrigin + '/' + $link.pathname
+        $downloadUrl = $link.href.Replace('about:', $urlOrigin)
         $7zInstaller = $link.nameProp
         (new-object System.Net.WebClient).DownloadFile($downloadUrl, (Get-Item -Path '.\').FullName + '\' + $7zInstaller)
         cmd /C $7zInstaller /S
